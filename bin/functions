@@ -1,0 +1,320 @@
+repeat wait() until game:IsLoaded()
+getgenv().VG = {}
+
+VG.User = Instance.new("VirtualInputManager")
+VG.FOV = 1000
+VG.Protecter = Instance.new("Model", CoreGui)
+sethiddenproperty(VG.Protecter, "RobloxLocked", true)
+
+-- Functions
+VG.Teleport = newcclosure(function(Player, Position)
+    if Player.Character and Player.Character:FindFirstChild("Humanoid") then
+        Player.Character.Humanoid.RootPart.CFrame = CFrame.new(Position)
+    end
+end)
+
+VG.Tween = newcclosure(function(Player, CFrame, Speed)
+    if Player.Character and Player.Character:FindFirstChild("Humanoid") then
+        local Time = (CFrame.Position - Player.Character.Humanoid.RootPart.Position).Magnitude / Speed
+        local Info = TweenInfo.new(Time, Enum.EasingStyle.Linear)
+        local Tween = TweenService:Create(Player.Character.Humanoid.RootPart, Info, {CFrame = CFrame})
+        if Tween then
+            Tween:Play()
+            Tween.Completed:Wait()
+        end
+    end
+end)
+
+VG.GetNearestPlayerToBasePart = function(BasePart)
+    for i,v in next, Players:GetPlayers() do
+        local Radius = gethiddenproperty(v, "SimulationRadius")
+        if (v.Character:GetModelCFrame().Position - BasePart.Position).Magnitude > Radius and v ~= Player then
+            return true
+        else
+            return false
+        end
+    end
+    return false
+end
+
+VG.isnetworkowner = isnetworkowner or newcclosure(function(BasePart)
+    if BasePart:IsA("BasePart") then
+        local Radius = gethiddenproperty(Player, "SimulationRadius")
+        if (BasePart:IsDescendantOf(Player.Character) or Mag(Player.Character:GetModelCFrame(), BasePart) <= Radius) and not VG.GetNearestPlayerToBasePart(BasePart) then
+            return true
+        else
+            return false
+        end
+    end
+    return false
+end)
+
+VG.SetSim = setsimulationradius or newcclosure(function(Radius)
+    sethiddenproperty(Player, "SimuationRadius", Radius)
+end)
+
+VG.SimuationRadius = newcclosure(function()
+    local Value = gethiddenproperty(Player, "SimulationRadius")
+    return Value
+end)
+
+VG.FireConnection = newcclosure(function(Singal)
+    for i,v in next, getconnections(Signal) do
+        v:Fire()
+    end
+end)
+
+VG.Kick = newcclosure(function(Message)
+    return Kick(Player, Message)
+end)
+
+VG.DisableConnection = newcclosure(function(Signal)
+    for i,v in next, getconnections(Signal) do
+        v:Disable()
+    end
+end)
+
+VG.GetPosition = newcclosure(function(Instance)
+    if Instance:IsA("BasePart") then
+        return Instance.Position
+    elseif Instance:IsA("Model") then
+        return Instance:GetModelCFrame().Position
+    end
+end)
+
+VG.GetCFrame = newcclosure(function(Instance)
+    if Instance:IsA("BasePart") then
+        return Instance.CFrame
+    elseif Instance:IsA("Model") then
+        return Instance:GetModelCFrame()
+    end
+end)
+
+
+
+VG.KeyPress = newcclosure(function(PressDown, Key, Repeated, Instance)
+    if not VG.User then
+        VG.User = Instance.new("VirtualInputManager")
+    elseif VG.User then
+        VG.User:SendKeyEvent(PressDown, Key, Repeated, Instance)
+    end
+end)
+
+VG.Crash = newcclosure(function()
+    while true do end
+end)
+
+VG.ChangeCFrame = newcclosure(function(Player, CFrame)
+    if Player.Character then
+        Player.Character:PivotTo(CFrame)
+    end
+end)
+
+VG.GetTool = newcclosure(function(Name)
+    if Player.Backpack:FindFirstChild(tostring(Name)) then
+        Player.Character:FindFirstChild("Humanoid"):EquipTool(Player.Backpack:FindFirstChild(Name))
+    end
+end)
+
+VG.FFC = newcclosure(function(Parent, Name)
+    return Parent:FindFirstChild(tostring(Name))
+end)
+
+VG.IsA = newcclosure(function(Parent, Name)
+    return Parent:FindFirstChildWhichIsA(tostring(Name), true)
+end)
+
+VG.WaitForChild = newcclosure(function(Parent, Name)
+    local A1 = Parent:WaitForChild(tostring(Name), math.huge)
+    return A1
+end)
+
+VG.GetProtecter = function()
+    return VG.Protecter
+end
+
+VG.Protect = newcclosure(function(GUI)
+    if type(GUI) == "userdata" then
+        sethiddenproperty(GUI, "RobloxLocked", true)
+    end
+end)
+
+VG.FFD = newcclosure(function(Parent, Name)
+    return Parent:FindFirstChild(tostring(Name), true)
+end)
+
+VG.EnableConnection = newcclosure(function(Signal)
+    for i,v in next, getconnections(Signal)	do
+        v:Enable()
+    end
+end)
+
+VG.Mag = newcclosure(function(Pos1, Pos2)
+    local Mag = math.floor((Pos2.Position - Pos1.Position).Magnitude)
+    return Mag
+end)
+-- Music Functions
+VG.MetalPipe = function(Loop)
+    local Pipe = Instance.new("Sound", Workspace)
+    Pipe.SoundId = "rbxassetid://6729922069"
+    Pipe.Looped = Loop
+    Pipe.Volume = 9e9
+    Pipe:Play()
+    wait(4)
+    Pipe:Destroy()
+end
+
+
+VG.Flying = function(Toggle, Speed)
+    getgenv().Toggle1 = Toggle
+    if Toggle then
+        print("Yes")
+        local Max = 0
+        local LP = Players.LocalPlayer
+        local Mouse = LP:GetMouse()
+        Max = Max + 1
+        if Toggle then
+            local T = LP.Character:FindFirstChild("UpperTorso",true) or LP.Character:FindFirstChild("HumanoidRootPart",true)
+            local S = {
+                F = 0,
+                B = 0,
+                L = 0,
+                R = 0
+            }
+            local S2 = {
+                F = 0,
+                B = 0,
+                L = 0,
+                R = 0
+            }
+            local SPEED = 5
+            local function FLY()
+                local BodyGyro = Instance.new("BodyGyro", T)
+                local BodyVelocity = Instance.new("BodyVelocity", T)
+                BodyGyro.P = 9e4
+                BodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+                BodyGyro.cframe = T.CFrame
+                BodyVelocity.velocity = Vector3.new(0, 0, 0)
+                BodyVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
+                spawn(function()
+                    repeat wait()
+                        LP.Character.Humanoid.PlatformStand = true
+                        if S.L + S.R ~= 0 or S.F + S.B ~= 0 then
+                            SPEED = Speed
+                        elseif not (S.L + S.R ~= 0 or S.F + S.B ~= 0) and SPEED ~= 0 then
+                            SPEED = 0
+                        end
+                        if (S.L + S.R) ~= 0 or (S.F + S.B) ~= 0 then
+                            BodyVelocity.velocity =
+                                ((Workspace.CurrentCamera.CoordinateFrame.lookVector * (S.F + S.B)) +
+                                ((Workspace.CurrentCamera.CoordinateFrame *
+                                CFrame.new(S.L + S.R, (S.F + S.B) * 0.2, 0).p) -
+                                Workspace.CurrentCamera.CoordinateFrame.p)) *
+                                SPEED
+                            S2 = {
+                                F = S.F,
+                                B = S.B,
+                                L = S.L,
+                                R = S.R
+                            }
+                        elseif (S.L + S.R) == 0 and (S.F + S.B) == 0 and SPEED ~= 0 then
+                            BodyVelocity.velocity =
+                                ((Workspace.CurrentCamera.CoordinateFrame.lookVector * (S2.F + S2.B)) +
+                                ((Workspace.CurrentCamera.CoordinateFrame *
+                                CFrame.new(S2.L + S2.R, (S2.F + S2.B) * 0.2, 0).p) -
+                                Workspace.CurrentCamera.CoordinateFrame.p)) *
+                                SPEED
+                        else
+                            BodyVelocity.velocity = Vector3.new(0, 0.1, 0)
+                        end
+                        BodyGyro.cframe = Workspace.CurrentCamera.CoordinateFrame
+                    until not Toggle or not Toggle1
+                    S = {
+                        F = 0,
+                        B = 0,
+                        L = 0,
+                        R = 0
+                    }
+                    S2 = {
+                        F = 0,
+                        B = 0,
+                        L = 0,
+                        R = 0
+                    }
+                    SPEED = 0
+                    BodyGyro:destroy()
+                    BodyVelocity:destroy()
+                    LP.Character.Humanoid.PlatformStand = false
+                end
+                )
+            end
+            Mouse.KeyDown:connect(
+                function(k)
+                    if k:lower() == "w" then
+                        S.F = 1
+                    elseif k:lower() == "s" then
+                        S.B = -1
+                    elseif k:lower() == "a" then
+                        S.L = -1
+                    elseif k:lower() == "d" then
+                        S.R = 1
+                    end
+                end
+            )
+            Mouse.KeyUp:connect(
+                function(k)
+                    if k:lower() == "w" then
+                        S.F = 0
+                    elseif k:lower() == "s" then
+                        S.B = 0
+                    elseif k:lower() == "a" then
+                        S.L = 0
+                    elseif k:lower() == "d" then
+                        S.R = 0
+                    end
+                end
+            )
+            FLY()
+            if Max == 2 then
+                Max = 0
+            end
+        end
+    end
+end
+
+VG.Players = function()
+    local Table = Players:GetPlayers()
+    return Table
+end
+
+VG.GetClosest = function()
+    local Max, C = math.huge, nil
+    for i,v in next, VG.Players() do
+        if v ~= Player and v.Character and v.Character.PrimaryPart then
+            local Mag = Mag(Player.Character:GetModelCFrame(), v.Character:GetModelCFrame()) < Max
+            if Mag <= Max then
+                C = v
+            end
+        end
+    end
+    return C
+end
+
+VG.GetClosestToCam = function()
+    local Max, C = VG.FOV, nil
+    for i,v in next, VG.Players() do
+        if v ~= Player and v.Character and v.Character.PrimaryPart then
+            local Head = v:FindFirstChild("Head", true)
+            if Head then
+                local Screen, Point = Workspace.CurrentCamera:WorldToScreenPoint(VG.GetPosition(Head))
+                if Screen then
+                    local Mag = (Vector2.new(Point.X, Point.Y) - Vector2.new(Player:GetMouse().X, Player:GetMouse().Y))
+                    if Mag <= Max then
+                        C = v
+                    end
+                end
+            end
+        end
+    end
+    return C
+end
