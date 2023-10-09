@@ -1015,10 +1015,14 @@ if development == true then
         PlaceholderText = "CFrame",
         RemoveTextAfterFocusLost = false,
         Callback = function(String)
-            local textLabel = ".TextLabel.LocalizedText"
-            local constructPath = print(String .. textLabel)
+            local dialog = String
 
-            print(constructPath)
+            -- Assuming you want to access the TextLabel.LocalizedText property
+            local textLabel = dialog.TextLabel
+            local localizedText = print(textLabel.LocalizedText)
+
+            -- Now, you can access the localizedText as needed
+            print(localizedText)
         end,
     })
 
@@ -1026,7 +1030,12 @@ if development == true then
         Name = "Print HeaderDialog(trade, minigame...) Info",
         Callback = function(Value)
             --PRINT INFO FROM DIALOGHEADER 
-            localizedTextValue = print(game:GetService("Players").LocalPlayer.PlayerGui.DialogApp.Dialog.HeaderDialog.Info.TextLabel.LocalizedText)
+            NormalDialogGUI = game:GetService("Players").LocalPlayer.PlayerGui.DialogApp.Dialog.NormalDialog.Info.TextLabel.LocalizedText
+
+            print(NormalDialogGUI)
+            if string.find(NormalDialogGUI, "Avanza o Cae!") then
+                print("Found TileSkip mini game!")
+            end
 
         end,
     })
@@ -1073,13 +1082,19 @@ local halloweenMiniGame = eventTab:CreateToggle({
         
                     -- Perform actions based on the action parameter
                     if action == "MiniGame starts" then
-                        getgenv().ToggleAutoFarm = false
-                        spawn_cframe = CFrame.new(9999.80469, 1991.7373, 9914.625, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-                        GoToStore("TileSkipMinigameLobby")
-                        wait(2)
-                        Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.Interiors.TileSkipMinigameLobby.JoinZone.EmitterPart.CFrame.Position)
-                        wait(70)
-                        ReplicatedStorage.API["MinigameAPI/MessageServer"]:FireServer("TileSkipMinigameJoinZone","reached_goal")
+                        --Read dialog Info
+                        NormalDialogGUI = game:GetService("Players").LocalPlayer.PlayerGui.DialogApp.Dialog.NormalDialog.Info.TextLabel.LocalizedText
+                        --Use Dialog Info to determine what mini game is starting
+                        if string.find(NormalDialogGUI, "Avanza o Cae!") then
+                            getgenv().ToggleAutoFarm = false
+                            spawn_cframe = CFrame.new(9999.80469, 1991.7373, 9914.625, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+                            GoToStore("TileSkipMinigameLobby")
+                            wait(2)
+                            Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.Interiors.TileSkipMinigameLobby.JoinZone.EmitterPart.CFrame.Position)
+                            wait(70)
+                            ReplicatedStorage.API["MinigameAPI/MessageServer"]:FireServer("TileSkipMinigameJoinZone","reached_goal")
+                        end
+                        
                     elseif action == "MiniGame ends" then
                         local Button = Player.PlayerGui.MinigameRewardsApp.Body.Button
                         local events = { "MouseButton1Click", "MouseButton1Down", "Activated" }
