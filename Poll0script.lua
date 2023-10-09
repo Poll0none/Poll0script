@@ -1010,6 +1010,27 @@ if development == true then
         end,
      })
 
+     local Input = developmentTab:CreateInput({
+        Name = "Print Gui Path TextLabel",
+        PlaceholderText = "CFrame",
+        RemoveTextAfterFocusLost = false,
+        Callback = function(String)
+            local textLabel = ".TextLabel.LocalizedText"
+            local constructPath = print(String .. textLabel)
+
+            print(constructPath)
+        end,
+    })
+
+    local Button = developmentTab:CreateButton({
+        Name = "Print HeaderDialog(trade, minigame...) Info",
+        Callback = function(Value)
+            --PRINT INFO FROM DIALOGHEADER 
+            localizedTextValue = print(game:GetService("Players").LocalPlayer.PlayerGui.DialogApp.Dialog.HeaderDialog.Info.TextLabel.LocalizedText)
+
+        end,
+    })
+
 end
 
 local eventTab = Window:CreateTab("🎃  Events")
