@@ -1,7 +1,7 @@
 --ENABLE DEVELOPMENT TAB WITH TOOLS
-getgenv().development = true
+--getgenv().development = false
 
---HALLOWEEN V3
+--Halloween Event - Auto TileSkip/HalloweenShop TP/MiniGame TP
 
 repeat wait() until game:IsLoaded()
 local StartTime = tick()
@@ -1071,14 +1071,12 @@ local halloweenMiniGame = eventTab:CreateToggle({
 
         local function assetsCheckGuiVisibility(Gui, action)
             local guiElement = Gui
-            print("assetsCheckGuiVisibility is alive!")
         
             if miniGames == true then
                 -- Check if the GUI element is visible
                 local isVisible = guiElement.Visible
         
                 if isVisible then
-                    print("The GUI element is on screen and visible!")
         
                     -- Perform actions based on the action parameter
                     if action == "MiniGame starts" then
@@ -1917,9 +1915,9 @@ local farmNeonToggle = autoFarmTab:CreateToggle({
     Callback = function(State)
         autoFarmNeon = State
         spawn(function()
+            local Neons = {}
             while autoFarmNeon and wait() do
                 pcall(function()
-                    local Neons = {}
                     local N = 0
                     for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[game.Players.LocalPlayer.Name].inventory.pets) do
                         local Old = v.id
