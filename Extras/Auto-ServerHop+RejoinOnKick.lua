@@ -17,15 +17,13 @@ local ServerHopper = function(time)
     end
 end
 
-spawn(function()
-    while wait(10) do
-        pcall(function()
+while wait(10) do
+    pcall(function()
 
-            ServerHopper(ServerHopperWait)
+        ServerHopper(ServerHopperWait)
 
-        end)
-    end
-end)
+    end)
+end
 spawn(function()
     while wait(60) do
         pcall(function()
