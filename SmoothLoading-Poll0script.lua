@@ -4,6 +4,7 @@
 --Halloween Event - Auto TileSkip/HalloweenShop TP/MiniGame TP
 
 repeat wait() until game:IsLoaded()
+wait(45)
 local StartTime = tick()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Poll0none/Poll0script/main/bin/functions"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Poll0none/Poll0script/main/bin/anti-cheat"))()
