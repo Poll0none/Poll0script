@@ -1942,8 +1942,59 @@ local ServerHop = autoFarmTab:CreateToggle({
     CurrentValue = false,
     Flag = "ServerHop", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(State)
-        wait(math.random(900,1200))
-        ServerHop()
+
+        wait(math.random(100))
+        local AvailableServers = HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. game.PlaceId .. '/servers/Public?sortOrder=Asc&limit=100'))
+
+        for i,v in next, AvailableServers.data do
+            if v.playing < 2 then
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, v.id, Player)
+                break
+            end
+        end
+
+    end,
+})
+local AutoKickRejoin = autoFarmTab:CreateToggle({
+    Name = "Joins server if kick or disconnect",
+    CurrentValue = false,
+    Flag = "AutoKickRejoin", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(State)
+
+        local antiKick = State
+        if antiKick == true then
+            spawn(function()
+                while wait() do
+                    pcall(function()
+                        getgenv().rejoin = game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
+                            if child.Name == 'ErrorPrompt' and child:FindFirstChild('MessageArea') and child.MessageArea:FindFirstChild("ErrorFrame") then
+            
+                                -- Create an array of delay values in seconds
+                                local delayValues = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300}
+                                
+                                -- Select a random delay value from the array
+                                local randomIndex = math.random(1, #delayValues)
+                                local selectedDelay = delayValues[randomIndex]
+                                
+                                -- Wait for the selected delay
+                                wait(selectedDelay)
+
+                                local AvailableServers = HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. game.PlaceId .. '/servers/Public?sortOrder=Asc&limit=100'))
+                                for i,v in next, AvailableServers.data do
+                                    if v.playing < 2 then
+                                        TeleportService:TeleportToPlaceInstance(game.PlaceId, v.id, Player)
+                                        break
+                                    end
+                                end
+            
+                            end
+                        end)
+                    end)
+                    wait(4)
+                end
+            end)
+        end
+
     end,
 })
 
