@@ -16,7 +16,7 @@ local ServerHopper = function(time)
         print("AutoKick is watching for errors")
         for i,v in next, ServerList.data do
             if v.playing >= 40 then
-                TeleportService:TeleportToPlaceInstance(game.PlaceId, v.id, Player)
+                 game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, v.id, Player)
                 break
             end
         end
