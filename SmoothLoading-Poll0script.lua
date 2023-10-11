@@ -4,7 +4,7 @@
 
 
 --DELETE THIS TOMORROW!! only temporary override of serverhop settings!
-getgenv().ServerHopperWait = math.random(2700, 5400)
+getgenv().ServerHopperWaitOVERRIDE = math.random(2700, 5400)
 
 --ENABLE DEVELOPMENT TAB WITH TOOLS
 --getgenv().development = false
@@ -34,7 +34,7 @@ end)
 
 --Make the ServerHop with getgenv().ServerHopperWait = math.random(7200, 10800) on autoexec file
 spawn(function()
-    ServerHopper(ServerHopperWait)
+    ServerHopper(ServerHopperWaitOVERRIDE)
 end)
 --Check if error or disconnect the serverhop
 spawn(function()
