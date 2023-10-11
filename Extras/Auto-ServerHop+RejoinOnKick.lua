@@ -52,6 +52,5 @@ spawn(function()
                 end
             end)
         end)
-        wait(4)
     end
 end)
