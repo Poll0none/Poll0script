@@ -9,6 +9,51 @@ local StartTime = tick()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Poll0none/Poll0script/main/bin/functions"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Poll0none/Poll0script/main/bin/anti-cheat"))()
 
+--Set getgenv().ServerHopperWait = math.random(10800, 14400) in your file before calling this script via loadstring
+
+local ServerHopper = function(time)
+    if time then
+        print("ServerHopper called and will jump to next server in: " .. time)
+    wait(time)
+        ServerHop()
+    else
+        print("AutoKick detected errors. ServerHopping now...")
+        ServerHop()
+    end
+end
+spawn(function()
+    ServerHopper(ServerHopperWait)
+end)
+
+spawn(function()
+    while wait() do
+            wait(60)
+        pcall(function()
+
+                --if child.Name == 'ErrorPrompt' and child:FindFirstChild('MessageArea') and child.MessageArea:FindFirstChild("ErrorFrame") then
+
+                game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
+                if child.Name == 'ErrorPrompt' then
+
+                    -- Create an array of delay values in seconds
+                    local delayValues = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300}
+
+                    -- Select a random delay value from the array
+                    local randomIndex = math.random(1, #delayValues)
+                    local selectedDelay = delayValues[randomIndex]
+
+                    -- Wait for the selected delay
+                    wait(selectedDelay)
+
+                    -- Now you've waited for a random delay based on the values in the array
+                    ServerHopper()
+
+                end
+            end)
+        end)
+    end
+end)
+
 --[[
 START BULIDING SCRIPT´S ENGINE
 ]]--
