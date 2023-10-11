@@ -1152,7 +1152,7 @@ local halloweenMiniGame = eventTab:CreateToggle({
                         getgenv().ToggleAutoFarm = true
                     end
                 else
-                    print("The GUI element is off screen or not visible.")
+                    wait(1)
                 end
             end
         end
