@@ -32,7 +32,8 @@ spawn(function()
 end)
 
 spawn(function()
-    while wait(60) do
+    while wait() do
+            wait(60)
         pcall(function()
 
                 --if child.Name == 'ErrorPrompt' and child:FindFirstChild('MessageArea') and child.MessageArea:FindFirstChild("ErrorFrame") then
