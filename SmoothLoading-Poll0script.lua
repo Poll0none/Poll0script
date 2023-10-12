@@ -3,7 +3,7 @@
 --Halloween Event - Auto TileSkip/HalloweenShop TP/MiniGame TP
 
 
---DELETE THIS TOMORROW!! only temporary override of serverhop settings!
+--DELETE THIS TOMORROW!! only temporary override of serverhop settings
 getgenv().ServerHopperWaitOVERRIDE = math.random(2700, 5400)
 
 --ENABLE DEVELOPMENT TAB WITH TOOLS
