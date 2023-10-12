@@ -2084,7 +2084,41 @@ local Input = autoBuyTab:CreateInput({
         getgenv().autoBuyPetBudget = String
         print(autoBuyPetSelected)
         print(autoBuyPettBudget)
+        
+        if autoBuyPetSelected == "halloween_2023_ghost_dog" then
+            local calc = String / 34000
+            getgenv().autoBuyPetAmount = math.floor(calc)
+            Rayfield:Notify({
+                Title = "💰  AutoBuy 💰",
+                Content = "\n" .. "You are about to buy: " .. autoBuyPetAmount .. " " .. autoBuyPetSelected  .. "\n" .. "Click confirm to execute",
+                Duration = 6.5,
+                Image = 4483362458,
+                })
+        end
 
+            
+        if autoBuyPetSelected == "halloween_2023_cuteacabra", then
+            local calc = String / 9000
+            getgenv().autoBuyPetAmount = math.floor(calc)
+            Rayfield:Notify({
+                Title = "💰  AutoBuy 💰",
+                Content = "\n" .. "You are about to buy: " .. autoBuyPetAmount .. " " .. autoBuyPetSelected  .. "\n" .. "Click confirm to execute",
+                Duration = 6.5,
+                Image = 4483362458,
+                })
+        end
+            
+        if autoBuyPetSelected == "halloween_2023_dire_stag" then
+            local calc = String / 125000
+            getgenv().autoBuyPetAmount = math.floor(calc)
+            Rayfield:Notify({
+                Title = "💰  AutoBuy 💰",
+                Content = "\n" .. "You are about to buy: " .. autoBuyPetAmount .. " " .. autoBuyPetSelected  .. "\n" .. "Click confirm to execute",
+                Duration = 6.5,
+                Image = 4483362458,
+                })
+        end
+            
         if autoBuyPetSelected == "halloween_2023_nightmare_owl" then
             local calc = String / 75000
             getgenv().autoBuyPetAmount = math.floor(calc)
