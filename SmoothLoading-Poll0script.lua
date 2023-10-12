@@ -1,15 +1,5 @@
 
 
---Halloween Event - Auto TileSkip/HalloweenShop TP/MiniGame TP
-
-
---DELETE THIS TOMORROW!! only temporary override of serverhop settings
-getgenv().ServerHopperWaitOVERRIDE = math.random(2700, 5400)
-
---ENABLE DEVELOPMENT TAB WITH TOOLS
---getgenv().development = false
-
-
 repeat wait() until game:IsLoaded()
 local StartTime = tick()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Poll0none/Poll0script/main/bin/functions"))()
