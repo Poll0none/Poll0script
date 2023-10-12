@@ -231,6 +231,9 @@ local Tasks = {
 }
 
 local Buypets = {
+    "halloween_2023_dire_stag",
+    "halloween_2023_cuteacabra",
+    "halloween_2023_ghost_dog",
     "halloween_2023_nightmare_owl",
     "halloween_2023_undead_elk",
     "halloween_2023_ghost",
