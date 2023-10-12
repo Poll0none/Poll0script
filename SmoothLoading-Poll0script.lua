@@ -1877,7 +1877,7 @@ local autoGrowPots = autoFarmTab:CreateToggle({
                         local kind = v.kind
         
                         -- Check if the pet is not a "practice dog" and its age is not 6
-                        if kind ~= "practice_dog" and age ~= 6 then
+                        if kind ~= "practice_dog" and kind ~= "starter_egg" and age ~= 6 then
                             local PetID = v.unique
                             ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
                             ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
