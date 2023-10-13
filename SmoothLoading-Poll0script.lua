@@ -1,3 +1,8 @@
+
+
+--Halloween Event - Auto TileSkip/HalloweenShop TP/MiniGame TP
+
+
 --DELETE THIS TOMORROW!! only temporary override of serverhop settings!
 getgenv().ServerHopperWaitOVERRIDE = math.random(2700, 5400)
 
@@ -1097,34 +1102,9 @@ end
 local eventTab = Window:CreateTab("🎃  Events")
 local Section = eventTab:CreateSection("🎃  EVENT RELATED OPTIONS  🎃")
 
-local GoToMiniGame2 = eventTab:CreateButton({
-    Name = "Go-To Chickatrice Says",
-    Callback = function(Value)
-        GoToStore("ChickatriceMinigame")
-        wait(2)
-        Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.StaticMap.TeleportLocations.chickatrice_minigame.CFrame.Position)
-    end,
-})  
 
-local GoToMiniGame = eventTab:CreateButton({
-    Name = "Go-To Mini-Game TileSkip",
-    Callback = function(Value)
-        GoToStore("TileSkipMinigameLobby")
-        wait(2)
-        Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.Interiors.TileSkipMinigameLobby.JoinZone.EmitterPart.CFrame.Position)
-    end,
-})  
-
-local GoToEventShop = eventTab:CreateButton({
-    Name = "Go to Halloween Shop",
-    Callback = function(Value)
-        GoToStore("Halloween2023Shop")
-        wait(2)
-        Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.Interiors.Halloween2023Shop.Event.BuyCurrency.HumanoidRootPart.CFrame.Position)
-    end,
-})
 local halloweenMiniGame = eventTab:CreateToggle({
-    Name = "Auto TileSkip Mini-Game",
+    Name = "Auto Mini-Games",
     CurrentValue = false,
     Flag = "MiniGame", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(State)
@@ -1154,6 +1134,19 @@ local halloweenMiniGame = eventTab:CreateToggle({
                             ReplicatedStorage.API["MinigameAPI/MessageServer"]:FireServer("TileSkipMinigameJoinZone","reached_goal")
                         end
                         
+                        if string.find(NormalDialogGUI, "Chickatrice") then
+                            getgenv().ToggleAutoFarm = false
+                            GoToStore("ChickatriceMinigame")
+                            wait(2)
+                            Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.StaticMap.TeleportLocations.chickatrice_minigame.CFrame.Position)
+                            Player.Character.HumanoidRootPart.Anchored = true
+                            
+                            repeat wait(5) until Player.Character.HumanoidRootPart.CFrame ~= CFrame.new(Workspace.StaticMap.TeleportLocations.chickatrice_minigame.CFrame.Position)
+                                print("TPing to game start")
+                                wait(2)
+                                Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,30,0))
+                                Player.Character.HumanoidRootPart.Anchored = true
+                        end
                     elseif action == "MiniGame ends" then
                         local Button = Player.PlayerGui.MinigameRewardsApp.Body.Button
                         local events = { "MouseButton1Click", "MouseButton1Down", "Activated" }
@@ -1179,6 +1172,57 @@ local halloweenMiniGame = eventTab:CreateToggle({
     end,
 })
 
+local halloweenTricks = eventTab:CreateToggle({
+    Name = "Auto Trick or Treat",
+    CurrentValue = false,
+    Flag = "halloweenTrickOrTreat", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(State)
+        local autoTrickOrTreat = State
+        
+        if autoTrickOrTreat then
+            spawn(function()
+                while wait(1) and autoTrickOrTreat do 
+                    for i,v in pairs(Players:GetPlayers()) do
+                        -- Do something with the player
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").API["HalloweenAPI/TrickOrTreatHouse"]:InvokeServer(game:GetService("Players")[v.Name])
+                            wait()
+                        end)
+                    end
+                    wait(600)
+                end
+            end)
+        end
+
+    end,
+})   
+
+local GoToEventShop = eventTab:CreateButton({
+    Name = "Go to Halloween Shop",
+    Callback = function(Value)
+        GoToStore("Halloween2023Shop")
+        wait(2)
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.Interiors.Halloween2023Shop.Event.BuyCurrency.HumanoidRootPart.CFrame.Position)
+    end,
+})
+
+local GoToMiniGame = eventTab:CreateButton({
+    Name = "Go-To Mini-Game TileSkip",
+    Callback = function(Value)
+        GoToStore("TileSkipMinigameLobby")
+        wait(2)
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.Interiors.TileSkipMinigameLobby.JoinZone.EmitterPart.CFrame.Position)
+    end,
+})
+
+local GoToMiniGame2 = eventTab:CreateButton({
+    Name = "Go-To Mini-game Chickatrice Says",
+    Callback = function(Value)
+        GoToStore("ChickatriceMinigame")
+        wait(2)
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.StaticMap.TeleportLocations.chickatrice_minigame.CFrame.Position)
+    end,
+})
 
 
 local teleportTab = Window:CreateTab("🧭  Teleports")
@@ -2386,15 +2430,18 @@ local characterLoad = game.Workspace:WaitForChild(game.Players.LocalPlayer.Name)
 getgenv().ToggleAutoFarm = true
 if characterLoad and ToggleAutoFarm == true then
     wait(5)
+    halloweenTricks:Set(true)
+    wait(0.2)
     farmAutoLures:Set(true)
-    wait(0.5)
+    wait(0.2)
     DropdownFG:Set(Fgpetlist[1])
-    wait(0.5)
+    wait(0.2)
     farmPetToggle:Set(true)
-    wait(0.5)
+    wait(0.2)
     farmBabyToggle:Set(true)
-    wait(0.5)
+    wait(0.2)
     halloweenMiniGame:Set(true)
+    wait(0.2)
 end
 
 
