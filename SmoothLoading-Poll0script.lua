@@ -1,8 +1,3 @@
-
-
---Halloween Event - Auto TileSkip/HalloweenShop TP/MiniGame TP
-
-
 --DELETE THIS TOMORROW!! only temporary override of serverhop settings!
 getgenv().ServerHopperWaitOVERRIDE = math.random(2700, 5400)
 
@@ -296,13 +291,6 @@ for i, v in pairs(getgc()) do
             end
         end
     end
-end
-
-local SetLocation = function(A, B, C)
-    local O = get_thread_identity()
-    set_thread_identity(2)
-    Location(A, B, C)
-    set_thread_identity(O)
 end
 
 local SetLocation = function(A, B, C)
@@ -1108,6 +1096,15 @@ end
 
 local eventTab = Window:CreateTab("🎃  Events")
 local Section = eventTab:CreateSection("🎃  EVENT RELATED OPTIONS  🎃")
+
+local GoToMiniGame2 = eventTab:CreateButton({
+    Name = "Go-To Chickatrice Says",
+    Callback = function(Value)
+        GoToStore("ChickatriceMinigame")
+        wait(2)
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.StaticMap.TeleportLocations.chickatrice_minigame.CFrame.Position)
+    end,
+})  
 
 local GoToMiniGame = eventTab:CreateButton({
     Name = "Go-To Mini-Game TileSkip",
