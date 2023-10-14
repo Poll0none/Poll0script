@@ -1279,9 +1279,10 @@ end,
 local Button = teleportTab:CreateButton({
     Name = "TP to Cave",
     Callback = function(Value)
-        SetLocation("Cave", "MainDoor", {})
+        GoToStore("Cave")
         Player.Character.HumanoidRootPart.CFrame = Workspace.Interiors:FindFirstChildWhichIsA('Model').Doors.MainDoor.WorkingParts.TouchToEnter.CFrame:ToWorldSpace(CFrame.new(0, 0, -6))    
-        Player.Character.HumanoidRootPart.CFrame = CFrame.new(1907.20605, 4007.0249, -10136.4375, 0.986310959, 0.0369677879, 0.160699427, 1.95991046e-08, 0.974546075, -0.224187627, -0.164896742, 0.221118718, 0.96120524)  
+        wait(1)
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(-6053.80225, 2008.3949, 3913.073, -0.317307979, -0.245433792, -0.91601187, 2.26257448e-08, 0.965928674, -0.258808345, 0.948322535, -0.0821219757, -0.306496859)  
 end,
 })
 
