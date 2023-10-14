@@ -300,7 +300,7 @@ end
 
 local SetLocation = function(A, B, C)
     local O = get_thread_identity()
-    set_thread_identity(2)
+    set_thread_identity(0)
     Location(A, B, C)
     set_thread_identity(7)
 end
