@@ -27,10 +27,13 @@ local ServerHopper = function(time)
         ServerHop()
     end
 end
+
+--[[
 --If server Times Out then serverhop
 game.NetworkClient.ChildRemoved:Connect(function()
    ServerHop()
 end)
+]]--
 
 --Make the ServerHop with getgenv().ServerHopperWait = math.random(7200, 10800) on autoexec file
 spawn(function()
