@@ -1154,6 +1154,8 @@ local halloweenMiniGame = eventTab:CreateToggle({
                             firesignal(Button[v])
                         end
                         GoToHome()
+                        wait(2)
+                        Player.Character.HumanoidRootPart.CFrame = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA('Model'):GetModelCFrame():ToWorldSpace(CFrame.new(0, 0, -6))
                         wait(5)
                         getgenv().ToggleAutoFarm = true
                     end
