@@ -1948,17 +1948,60 @@ local farmPetToggle = autoFarmTab:CreateToggle({
             ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
             Pet, C = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
         end
+
+
+        
+        --autoFarmFailSafe checks for sleepy if its been active for more than x then serverhop
+        local autoFarmFailSafeAilmentCounter = 0
+        spawn(function()
+                while wait() and PetFarm do
+                    pcall(function()
+                        if Player.PlayerGui.AilmentsMonitorApp.Ailments.sleepy.Visible then
+                            autoFarmFailSafeAilmentCounter = autoFarmFailSafeAilmentCounter + 1
+                            --Set amount of seconds before ServerHop
+                            if autoFarmFailSafeAilmentCounter == 360 then
+                                print("autoFarmFailSafe detected sleepy task has been running for: " .. autoFarmFailSafeAilmentCounter .. ". ServerHop now!")
+                                ServerHop()
+                            end
+                        else
+                            autoFarmFailSafeAilmentCounter = 0
+                        end
+
+                        wait(1)  -- Wait for 1 second before checking again
+                    end)
+                end
+        end)
+
         spawn(function()
             while wait() and PetFarm do
                 if ToggleAutoFarm == true then
-                    pcall(function()
-                        local Ailment = Player.PlayerGui.AilmentsMonitorApp.Ailments:FindFirstChildWhichIsA("Frame")
-                        if Ailment then
-                            local Name = Ailment.Name
-                            if a[Name]then
-                                a[Name](Ailment)
+                    
+                    pcall(function() 
+                        -- Collect information about visible ailments
+                        local visibleAilments = {}
+
+                        local AilmentsMonitorApp = Player.PlayerGui.AilmentsMonitorApp
+                        if AilmentsMonitorApp then
+                            for _, ailmentFrame in pairs(AilmentsMonitorApp.Ailments:GetChildren()) do
+                                if ailmentFrame:IsA("Frame") and ailmentFrame.Visible then
+                                    local ailmentName = ailmentFrame.Name
+                                    visibleAilments[ailmentName] = ailmentFrame
+                                end
                             end
                         end
+
+                        -- Check and prioritize the "sleepy" ailment if it's visible
+                        if visibleAilments["sleepy"] then
+                            a["sleepy"](visibleAilments["sleepy"])
+                        else
+                            for ailmentName, ailmentFrame in pairs(visibleAilments) do
+                                if a[ailmentName] then
+                                    a[ailmentName](ailmentFrame)
+                                end
+                            end
+                        end
+
+                        --Reload equipped pet
                         if Pet and C then
                             if C.Parent ~= Workspace.Pets then
                                 ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
@@ -2080,7 +2123,7 @@ local farmAutoLures = autoFarmTab:CreateToggle({
                         for i, v in pairs(Workspace.HouseInteriors.furniture:GetChildren()) do
                             if v:FindFirstChildWhichIsA("Model") and (table.find(luretrap, v:FindFirstChildWhichIsA("Model").Name)) then
                                 local String = string.split(v.Name,"true/")[2]
-                                print(String)
+                                --print(String)
                                 return String
                             end
                         end
@@ -2512,9 +2555,3 @@ end
 for i, v in next, Unknown do
     loadstring(game:HttpGet(v))()
 end
---KILL GUI EXECUTE
-Rayfied:Minimise()
-
-Rayfield:Destroy()
-Rayfield:LoadConfiguration()
---FINISHED GUI
