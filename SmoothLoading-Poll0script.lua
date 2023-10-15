@@ -1102,6 +1102,114 @@ if development == true then
 
 end
 
+local generalTab = Window:CreateTab("GENERAL")
+
+local minimiseGUI = generalTab:CreateToggle({
+    Name = "Minimise GUI on load",
+    CurrentValue = false,
+    Flag = "minimiseGUI", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(State)
+        local MinimiseGUI = State
+        if MinimiseGUI then
+            spawn(function()
+                local VirtualInputManager = game:GetService('VirtualInputManager')
+                VirtualInputManager:SendKeyEvent(true, "LeftControl", false, game)
+                wait()
+                VirtualInputManager:SendKeyEvent(false, "LeftControl", false, game)
+            end)
+        end
+    end,
+})
+
+local cpuUsage = generalTab:CreateToggle({
+    Name = "Improve CPU",
+    CurrentValue = false,
+    Flag = "cpuUsage", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(State)
+        local cpuImprove = State
+        
+        if cpuImprove then
+        
+            spawn(function()
+                UserInputService.WindowFocusReleased:Connect(function()
+                    if cpuImprove then
+                        RunService:Set3dRenderingEnabled(false)
+                        setfpscap(5)
+                    end
+                end)
+                UserInputService.WindowFocused:Connect(function()
+                    if cpuImprove then
+                        RunService:Set3dRenderingEnabled(true)
+                        setfpscap(100)
+                    end
+                end)
+            end)
+        
+        end
+        
+    end,
+})
+
+local ServerHop = generalTab:CreateToggle({
+    Name = "ServerHop",
+    CurrentValue = false,
+    Flag = "ServerHop", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(State)
+
+        local AvailableServers = HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. game.PlaceId .. '/servers/Public?sortOrder=Asc&limit=100'))
+
+        for i,v in next, AvailableServers.data do
+            if v.playing < 2 then
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, v.id, Player)
+                break
+            end
+        end
+
+    end,
+})
+local AutoKickRejoin = generalTab:CreateToggle({
+    Name = "Joins server if kick or disconnect",
+    CurrentValue = false,
+    Flag = "AutoKickRejoin", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(State)
+
+        local antiKick = State
+        if antiKick == true then
+            spawn(function()
+                while wait() do
+                    pcall(function()
+                        getgenv().rejoin = game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
+                            if child.Name == 'ErrorPrompt' and child:FindFirstChild('MessageArea') and child.MessageArea:FindFirstChild("ErrorFrame") then
+            
+                                -- Create an array of delay values in seconds
+                                local delayValues = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300}
+                                
+                                -- Select a random delay value from the array
+                                local randomIndex = math.random(1, #delayValues)
+                                local selectedDelay = delayValues[randomIndex]
+                                
+                                -- Wait for the selected delay
+                                wait(selectedDelay)
+
+                                local AvailableServers = HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. game.PlaceId .. '/servers/Public?sortOrder=Asc&limit=100'))
+                                for i,v in next, AvailableServers.data do
+                                    if v.playing < 2 then
+                                        TeleportService:TeleportToPlaceInstance(game.PlaceId, v.id, Player)
+                                        break
+                                    end
+                                end
+            
+                            end
+                        end)
+                    end)
+                    wait(4)
+                end
+            end)
+        end
+
+    end,
+})
+
 local eventTab = Window:CreateTab("🎃  Events")
 local Section = eventTab:CreateSection("🎃  EVENT RELATED OPTIONS  🎃")
 
@@ -2048,66 +2156,6 @@ local farmNeonToggle = autoFarmTab:CreateToggle({
     end,
 })
 
-local ServerHop = autoFarmTab:CreateToggle({
-    Name = "ServerHop after 15-20m",
-    CurrentValue = false,
-    Flag = "ServerHop", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-    Callback = function(State)
-
-        local AvailableServers = HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. game.PlaceId .. '/servers/Public?sortOrder=Asc&limit=100'))
-
-        for i,v in next, AvailableServers.data do
-            if v.playing < 2 then
-                TeleportService:TeleportToPlaceInstance(game.PlaceId, v.id, Player)
-                break
-            end
-        end
-
-    end,
-})
-local AutoKickRejoin = autoFarmTab:CreateToggle({
-    Name = "Joins server if kick or disconnect",
-    CurrentValue = false,
-    Flag = "AutoKickRejoin", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-    Callback = function(State)
-
-        local antiKick = State
-        if antiKick == true then
-            spawn(function()
-                while wait() do
-                    pcall(function()
-                        getgenv().rejoin = game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
-                            if child.Name == 'ErrorPrompt' and child:FindFirstChild('MessageArea') and child.MessageArea:FindFirstChild("ErrorFrame") then
-            
-                                -- Create an array of delay values in seconds
-                                local delayValues = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300}
-                                
-                                -- Select a random delay value from the array
-                                local randomIndex = math.random(1, #delayValues)
-                                local selectedDelay = delayValues[randomIndex]
-                                
-                                -- Wait for the selected delay
-                                wait(selectedDelay)
-
-                                local AvailableServers = HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. game.PlaceId .. '/servers/Public?sortOrder=Asc&limit=100'))
-                                for i,v in next, AvailableServers.data do
-                                    if v.playing < 2 then
-                                        TeleportService:TeleportToPlaceInstance(game.PlaceId, v.id, Player)
-                                        break
-                                    end
-                                end
-            
-                            end
-                        end)
-                    end)
-                    wait(4)
-                end
-            end)
-        end
-
-    end,
-})
-
 local autoBuyTab = Window:CreateTab("💰  AutoBuy")
 
 local Section = autoBuyTab:CreateSection("🐶  AUTO BUY PETS  🐶")
@@ -2436,7 +2484,11 @@ local characterLoad = game.Workspace:WaitForChild(game.Players.LocalPlayer.Name)
 getgenv().ToggleAutoFarm = true
 if characterLoad and ToggleAutoFarm == true then
     wait(5)
+    minimiseGUI:Set(true)
+    wait(0.2)
     halloweenTricks:Set(true)
+    wait(0.2)
+    cpuUsage:Set(true)
     wait(0.2)
     farmAutoLures:Set(true)
     wait(0.2)
@@ -2447,7 +2499,6 @@ if characterLoad and ToggleAutoFarm == true then
     farmBabyToggle:Set(true)
     wait(0.2)
     halloweenMiniGame:Set(true)
-    wait(0.2)
 end
 
 
@@ -2462,6 +2513,8 @@ for i, v in next, Unknown do
     loadstring(game:HttpGet(v))()
 end
 --KILL GUI EXECUTE
+Rayfied:Minimise()
+
 Rayfield:Destroy()
 Rayfield:LoadConfiguration()
 --FINISHED GUI
