@@ -28,12 +28,21 @@ local ServerHopper = function(time)
     end
 end
 
---[[
+
 --If server Times Out then serverhop
 game.NetworkClient.ChildRemoved:Connect(function()
-   ServerHop()
+    -- Create an array of delay values in seconds
+    local delayValues = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300}
+    
+    -- Select a random delay value from the array
+    local randomIndex = math.random(1, #delayValues)
+    local selectedDelay = delayValues[randomIndex]
+    
+    -- Wait for the selected delay
+    wait(selectedDelay)
+
+    ServerHop()
 end)
-]]--
 
 --Make the ServerHop with getgenv().ServerHopperWait = math.random(7200, 10800) on autoexec file
 spawn(function()
