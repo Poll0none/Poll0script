@@ -1,5 +1,3 @@
-
-
 --Halloween Event - Auto TileSkip/HalloweenShop TP/MiniGame TP
 
 
@@ -2054,8 +2052,6 @@ local farmPetToggle = autoFarmTab:CreateToggle({
                     print("autoFarmFailSafe detected sleepy task has been running for: " .. autoFarmFailSafeAilmentCounter .. ". ServerHop now!")
                     ServerHopper()
                 end
-
-                print("autoFailSafe: Sleepy is not visible" .. autoFarmFailSafeAilmentCounter)
 
                 wait(1)  -- Wait for 1 second before checking again
             end
