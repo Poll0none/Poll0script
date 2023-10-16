@@ -2019,6 +2019,7 @@ local farmPetToggle = autoFarmTab:CreateToggle({
         --autoFarmFailSafe checks for sleepy, if its been active for more than x then serverhop
         spawn(function()
             local autoFarmFailSafeAilmentCounter = 0
+            local autoFarmFailSafeTriggerCounter = 0
             while wait() and PetFarm do
                 pcall(function()
                     if Player.PlayerGui.AilmentsMonitorApp.Ailments.sleepy.Visible then
@@ -2026,33 +2027,22 @@ local farmPetToggle = autoFarmTab:CreateToggle({
                         print("autoFailSafe: Sleepy is a visible task" .. autoFarmFailSafeAilmentCounter)
                         --Set amount of seconds before ServerHop
                     else
-                        autoFarmFailSafeAilmentCounter = 0
+                        autoFarmFailSafeAilmentCounter = 0      
+                        autoFarmFailSafeTriggerCounter = 0
                     end
                 end)
-
-                if autoFarmFailSafeAilmentCounter == 90 then
-                    print("autoFailSafe: triggered first action: " .. autoFarmFailSafeAilmentCounter .. ". Reequipping pet")
-                    if Pet and C then
-                        if C.Parent ~= Workspace.Pets then
-                            ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
-                            Pet, C = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
-                        end
-                    else
-                        ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
-                        Pet, C = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
-                    end
-                    print("autoFailSafe: pet reequipped")
-                end
                 if autoFarmFailSafeAilmentCounter == 150 then
-                    print("autoFailSafe: triggered first action: " .. autoFarmFailSafeAilmentCounter .. ". Resetting character")
-                    ResetCharacter()
-                    print("autoFailSafe: Character has been reset")
+                    autoFarmFailSafeTriggerCounter = autoFarmFailSafeTriggerCounter + 1
+                    --if autoFarmFailSafeTriggerCounter gets greater than x then serverhop
+                    if autoFarmFailSafeTriggerCounter >= 2 then 
+                        print("autoFarmFailSafe detected sleepy task has been running for: " .. autoFarmFailSafeAilmentCounter .. ". ServerHop now!")
+                        ServerHopper()
+                    else
+                        print("autoFailSafe: triggered first action: " .. autoFarmFailSafeAilmentCounter .. ". Resetting character")
+                        ResetCharacter()
+                        print("autoFailSafe: Character has been reset")
+                    end
                 end
-                if autoFarmFailSafeAilmentCounter == 360 then
-                    print("autoFarmFailSafe detected sleepy task has been running for: " .. autoFarmFailSafeAilmentCounter .. ". ServerHop now!")
-                    ServerHopper()
-                end
-
                 wait(1)  -- Wait for 1 second before checking again
             end
         end)
