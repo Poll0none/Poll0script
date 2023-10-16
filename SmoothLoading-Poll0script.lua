@@ -18,11 +18,11 @@ local ResetCharacter = function()
         VirtualInputManager:SendKeyEvent(true, "Escape", false, game)
         wait()
         VirtualInputManager:SendKeyEvent(false, "Escape", false, game)
-        wait()
+        wait(1)
         VirtualInputManager:SendKeyEvent(true, "R", false, game)
         wait()
         VirtualInputManager:SendKeyEvent(false, "R", false, game)
-        wait()
+        wait(3)
         VirtualInputManager:SendKeyEvent(true, "Return", false, game)
         wait()
         VirtualInputManager:SendKeyEvent(false, "Return", false, game)
@@ -2034,14 +2034,14 @@ local farmPetToggle = autoFarmTab:CreateToggle({
                 if autoFarmFailSafeAilmentCounter == 150 then
                     autoFarmFailSafeTriggerCounter = autoFarmFailSafeTriggerCounter + 1
                     --if autoFarmFailSafeTriggerCounter gets greater than x then serverhop
-                    if autoFarmFailSafeTriggerCounter >= 2 then 
-                        print("autoFarmFailSafe detected sleepy task has been running for: " .. autoFarmFailSafeAilmentCounter .. ". ServerHop now!")
-                        ServerHopper()
-                    else
-                        print("autoFailSafe: triggered first action: " .. autoFarmFailSafeAilmentCounter .. ". Resetting character")
-                        ResetCharacter()
-                        print("autoFailSafe: Character has been reset")
-                    end
+                    print("autoFailSafe: triggered first action: " .. autoFarmFailSafeAilmentCounter .. ". Resetting character")
+                    ResetCharacter()
+                    print("autoFailSafe: Character has been reset")
+                elseif autoFarmFailSafeAilmentCounter >= 300 then
+                    autoFarmFailSafeTriggerCounter = autoFarmFailSafeTriggerCounter + 1
+                end
+                if autoFarmFailSafeTriggerCounter >= 2 then
+                    ServerHopper()
                 end
                 wait(1)  -- Wait for 1 second before checking again
             end
