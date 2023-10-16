@@ -15,8 +15,23 @@ local StartTime = tick()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Poll0none/Poll0script/main/bin/functions"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Poll0none/Poll0script/main/bin/anti-cheat"))()
 
---Set getgenv().ServerHopperWait = math.random(10800, 14400) in your file before calling this script via loadstring
+local ResetCharacter = function()
+    local VirtualInputManager = game:GetService('VirtualInputManager')
+        VirtualInputManager:SendKeyEvent(true, "Escape", false, game)
+        wait()
+        VirtualInputManager:SendKeyEvent(false, "Escape", false, game)
+        wait()
+        VirtualInputManager:SendKeyEvent(true, "R", false, game)
+        wait()
+        VirtualInputManager:SendKeyEvent(false, "R", false, game)
+        wait()
+        VirtualInputManager:SendKeyEvent(true, "Return", false, game)
+        wait()
+        VirtualInputManager:SendKeyEvent(false, "Return", false, game)
+        wait()
+end
 
+--Set getgenv().ServerHopperWait = math.random(10800, 14400) in your file before calling this script via loadstring
 local ServerHopper = function(time)
     if time then
         print("ServerHopper called and will jump to next server in: " .. time)
@@ -41,7 +56,7 @@ game.NetworkClient.ChildRemoved:Connect(function()
     -- Wait for the selected delay
     wait(selectedDelay)
 
-    ServerHop()
+    ServerHopper()
 end)
 
 --Make the ServerHop with getgenv().ServerHopperWait = math.random(7200, 10800) on autoexec file
@@ -1958,29 +1973,6 @@ local farmPetToggle = autoFarmTab:CreateToggle({
             Pet, C = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
         end
 
-
-        
-        --autoFarmFailSafe checks for sleepy if its been active for more than x then serverhop
-        local autoFarmFailSafeAilmentCounter = 0
-        spawn(function()
-                while wait() and PetFarm do
-                    pcall(function()
-                        if Player.PlayerGui.AilmentsMonitorApp.Ailments.sleepy.Visible then
-                            autoFarmFailSafeAilmentCounter = autoFarmFailSafeAilmentCounter + 1
-                            --Set amount of seconds before ServerHop
-                            if autoFarmFailSafeAilmentCounter == 360 then
-                                print("autoFarmFailSafe detected sleepy task has been running for: " .. autoFarmFailSafeAilmentCounter .. ". ServerHop now!")
-                                ServerHop()
-                            end
-                        else
-                            autoFarmFailSafeAilmentCounter = 0
-                        end
-
-                        wait(1)  -- Wait for 1 second before checking again
-                    end)
-                end
-        end)
-
         spawn(function()
             while wait() and PetFarm do
                 if ToggleAutoFarm == true then
@@ -2024,6 +2016,51 @@ local farmPetToggle = autoFarmTab:CreateToggle({
                 end
             end
         end)
+
+        
+        --autoFarmFailSafe checks for sleepy, if its been active for more than x then serverhop
+        spawn(function()
+            local autoFarmFailSafeAilmentCounter = 0
+            while wait() and PetFarm do
+                pcall(function()
+                    if Player.PlayerGui.AilmentsMonitorApp.Ailments.sleepy.Visible then
+                        autoFarmFailSafeAilmentCounter = autoFarmFailSafeAilmentCounter + 1
+                        print("autoFailSafe: Sleepy is a visible task" .. autoFarmFailSafeAilmentCounter)
+                        --Set amount of seconds before ServerHop
+                    else
+                        autoFarmFailSafeAilmentCounter = 0
+                    end
+                end)
+
+                if autoFarmFailSafeAilmentCounter == 90 then
+                    print("autoFailSafe: triggered first action: " .. autoFarmFailSafeAilmentCounter .. ". Reequipping pet")
+                    if Pet and C then
+                        if C.Parent ~= Workspace.Pets then
+                            ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
+                            Pet, C = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
+                        end
+                    else
+                        ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
+                        Pet, C = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
+                    end
+                    print("autoFailSafe: pet reequipped")
+                end
+                if autoFarmFailSafeAilmentCounter == 150 then
+                    print("autoFailSafe: triggered first action: " .. autoFarmFailSafeAilmentCounter .. ". Resetting character")
+                    ResetCharacter()
+                    print("autoFailSafe: Character has been reset")
+                end
+                if autoFarmFailSafeAilmentCounter == 360 then
+                    print("autoFarmFailSafe detected sleepy task has been running for: " .. autoFarmFailSafeAilmentCounter .. ". ServerHop now!")
+                    ServerHopper()
+                end
+
+                print("autoFailSafe: Sleepy is not visible" .. autoFarmFailSafeAilmentCounter)
+
+                wait(1)  -- Wait for 1 second before checking again
+            end
+        end)
+
     end,
 })
 
