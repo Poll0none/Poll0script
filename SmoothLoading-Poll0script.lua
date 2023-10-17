@@ -1886,6 +1886,7 @@ local DropdownFG = autoFarmTab:CreateDropdown({
     Flag = "", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(A)
 
+        
         Key = Fgpet[A]
 
     end,
@@ -2073,6 +2074,22 @@ Callback = function(State)
 end,
 })
 
+local Input = autoFarmTab:CreateInput({
+    Name = "Grow this Pet with Grow Pots",
+    PlaceholderText = "Input Placeholder",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(String)
+        if string.len(String) >= 1 then
+            getgenv().PetToMakeNeon = String
+        else
+            getgenv().PetToMakeNeon = nil
+        end
+        for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
+            print(v.id)
+        end
+    end,
+})
+
 local autoGrowPots = autoFarmTab:CreateToggle({
     Name = "Auto Use Grow Potions",
     CurrentValue = false,
@@ -2102,18 +2119,33 @@ local autoGrowPots = autoFarmTab:CreateToggle({
                         local kind = v.kind
         
                         -- Check if the pet is not a "practice dog" and its age is not 6
-                        if kind ~= "practice_dog" and kind ~= "starter_egg" and age ~= 6 then
-                            local PetID = v.unique
-                            ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
-                            ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
-        
-                            -- Only use the age potion if the pet is not already at age 6
-                            if age < 6 then
-                                ReplicatedStorage:FindFirstChild("PetObjectAPI/CreatePetObject", true):InvokeServer("__Enum_PetObjectCreatorType_2", {["unique_id"] = Tea})
-                                ReplicatedStorage:FindFirstChild("PetAPI/ConsumeFoodItem", true):FireServer(Tea)
+                        if PetToMakeNeon then
+                            if kind ~= "practice_dog" and kind ~= "starter_egg" and kind == PetToMakeNeon and age ~= 6 then
+                                local PetID = v.unique
+                                ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
+            
+                                -- Only use the age potion if the pet is not already at age 6
+                                if age < 6 then
+                                    ReplicatedStorage:FindFirstChild("PetObjectAPI/CreatePetObject", true):InvokeServer("__Enum_PetObjectCreatorType_2", {["unique_id"] = Tea})
+                                    ReplicatedStorage:FindFirstChild("PetAPI/ConsumeFoodItem", true):FireServer(Tea)
+                                end
+            
+                                wait(2)
                             end
-        
-                            wait(2)
+                        else
+                            if kind ~= "practice_dog" and kind ~= "starter_egg" and age ~= 6 then
+                                local PetID = v.unique
+                                ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
+                                ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
+            
+                                -- Only use the age potion if the pet is not already at age 6
+                                if age < 6 then
+                                    ReplicatedStorage:FindFirstChild("PetObjectAPI/CreatePetObject", true):InvokeServer("__Enum_PetObjectCreatorType_2", {["unique_id"] = Tea})
+                                    ReplicatedStorage:FindFirstChild("PetAPI/ConsumeFoodItem", true):FireServer(Tea)
+                                end
+            
+                                wait(2)
+                            end
                         end
                     end
                 end)
