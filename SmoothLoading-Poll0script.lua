@@ -18,11 +18,11 @@ local ResetCharacter = function()
         VirtualInputManager:SendKeyEvent(true, "Escape", false, game)
         wait()
         VirtualInputManager:SendKeyEvent(false, "Escape", false, game)
-        wait(1)
+        wait(.2)
         VirtualInputManager:SendKeyEvent(true, "R", false, game)
         wait()
         VirtualInputManager:SendKeyEvent(false, "R", false, game)
-        wait(3)
+        wait(1)
         VirtualInputManager:SendKeyEvent(true, "Return", false, game)
         wait()
         VirtualInputManager:SendKeyEvent(false, "Return", false, game)
@@ -1456,7 +1456,7 @@ Callback = function(Value)
 end,
 })
 local Paragraph = teleportTab:CreateParagraph({Title = "🔴How does this feature work❔🔴", Content = "Can find inputted display name, also by Roblox user name"})
-
+--[[
 local petHuntTab = Window:CreateTab("🔎  PetHunt")
 
 local Button = petHuntTab:CreateButton({
@@ -1465,6 +1465,7 @@ Callback = function(Value)
     PetHuntLoop()
 end,
 })
+]]--
 
 local autoTradeTab = Window:CreateTab("💎  AutoTrade")
 
@@ -1978,7 +1979,6 @@ local farmPetToggle = autoFarmTab:CreateToggle({
                     pcall(function() 
                         -- Collect information about visible ailments
                         local visibleAilments = {}
-
                         local AilmentsMonitorApp = Player.PlayerGui.AilmentsMonitorApp
                         if AilmentsMonitorApp then
                             for _, ailmentFrame in pairs(AilmentsMonitorApp.Ailments:GetChildren()) do
@@ -1988,7 +1988,6 @@ local farmPetToggle = autoFarmTab:CreateToggle({
                                 end
                             end
                         end
-
                         -- Check and prioritize the "sleepy" ailment if it's visible
                         if visibleAilments["sleepy"] then
                             a["sleepy"](visibleAilments["sleepy"])
@@ -1999,7 +1998,6 @@ local farmPetToggle = autoFarmTab:CreateToggle({
                                 end
                             end
                         end
-
                         --Reload equipped pet
                         if Pet and C then
                             if C.Parent ~= Workspace.Pets then
@@ -2011,6 +2009,7 @@ local farmPetToggle = autoFarmTab:CreateToggle({
                             Pet, C = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
                         end
                     end)
+
                 end
             end
         end)
@@ -2019,28 +2018,21 @@ local farmPetToggle = autoFarmTab:CreateToggle({
         --autoFarmFailSafe checks for sleepy, if its been active for more than x then serverhop
         spawn(function()
             local autoFarmFailSafeAilmentCounter = 0
-            local autoFarmFailSafeTriggerCounter = 0
             while wait() and PetFarm do
                 pcall(function()
-                    if Player.PlayerGui.AilmentsMonitorApp.Ailments.sleepy.Visible then
+                    local sleepyAilment = Player.PlayerGui.AilmentsMonitorApp.Ailments:FindFirstChild("sleepy")
+                    if sleepyAilment then
                         autoFarmFailSafeAilmentCounter = autoFarmFailSafeAilmentCounter + 1
                         print("autoFailSafe: Sleepy is a visible task" .. autoFarmFailSafeAilmentCounter)
-                        --Set amount of seconds before ServerHop
-                    else
-                        autoFarmFailSafeAilmentCounter = 0      
-                        autoFarmFailSafeTriggerCounter = 0
+                    elseif not sleepyAilment then
+                        autoFarmFailSafeAilmentCounter = 0
                     end
                 end)
-                if autoFarmFailSafeAilmentCounter == 150 then
-                    autoFarmFailSafeTriggerCounter = autoFarmFailSafeTriggerCounter + 1
-                    --if autoFarmFailSafeTriggerCounter gets greater than x then serverhop
+                if autoFarmFailSafeAilmentCounter == 210 then
                     print("autoFailSafe: triggered first action: " .. autoFarmFailSafeAilmentCounter .. ". Resetting character")
                     ResetCharacter()
                     print("autoFailSafe: Character has been reset")
-                elseif autoFarmFailSafeAilmentCounter >= 300 then
-                    autoFarmFailSafeTriggerCounter = autoFarmFailSafeTriggerCounter + 1
-                end
-                if autoFarmFailSafeTriggerCounter >= 2 then
+                elseif autoFarmFailSafeAilmentCounter >= 420 then
                     ServerHopper()
                 end
                 wait(1)  -- Wait for 1 second before checking again
