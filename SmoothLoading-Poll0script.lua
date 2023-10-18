@@ -1515,6 +1515,7 @@ Name = "AutoTransfer To: ",
 PlaceholderText = "Username(Respect Capital letters)",
 RemoveTextAfterFocusLost = false,
 Callback = function(String)
+    getgenv().autoTradeMoneyTo = String
     getgenv().autoTradeTo = ""
     for i,v in pairs(Players:GetPlayers()) do
         if v.Name == (String) or v.Name:find(String) or v.DisplayName == String or v.DisplayName:find(String) then
@@ -1739,6 +1740,7 @@ local Toggle = autoTradeTab:CreateToggle({
     CurrentValue = false,
     Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(State)
+        --[[
         local brake = "\n"
         Rayfield:Notify({
             Title = "🔴 MONEY TRANSFER INFO 🔴",
@@ -1754,19 +1756,24 @@ local Toggle = autoTradeTab:CreateToggle({
             },
             },
             })
+        ]]--
 
         getgenv().autoTradeBuy = State
         spawn(function()
             while wait() and autoTradeBuy do 
                 pcall(function()
-                    ReplicatedStorage.API:FindFirstChild("RefreshmentStandAPI/BuyRefreshment"):InvokeServer("hotdog_stand",autoTradeTo)
-                    ReplicatedStorage.API:FindFirstChild("RefreshmentStandAPI/BuyRefreshment"):InvokeServer("lemonade_stand",autoTradeTo)
+                    -- Create a function that evaluates the variable dynamically
+                    local evaluateVariable = loadstring("return game:GetService('Players')." .. autoTradeMoneyTo)
+                    -- Call the function to get the value
+                    local userNameVariable = evaluateVariable()
+                    ReplicatedStorage.API:FindFirstChild("RefreshmentStandAPI/BuyRefreshment"):InvokeServer("hotdog_stand",userNameVariable,50)
+                    ReplicatedStorage.API:FindFirstChild("RefreshmentStandAPI/BuyRefreshment"):InvokeServer("lemonade_stand",userNameVariable,20)
                     for i,v in pairs(getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)) do
                         v.Function()
                         v:Fire()
-                        wait(30)
-                    end 
+                    end
                 end)
+                wait(math.random(29, 34))
             end 
         end)
     end,
@@ -1801,11 +1808,15 @@ local Input = autoTradeTab:CreateInput({
         },
         },
         })
-
+        -- Create a function that evaluates the variable dynamically
+        local evaluateVariable = loadstring("return game:GetService('Players')." .. autoTradeMoneyTo)
+        -- Call the function to get the value
+        local userNameVariable = evaluateVariable()
         spawn(function()
             for i = moneyTransferIterations, 1, -1 do
                 pcall(function()
-                    ReplicatedStorage.API:FindFirstChild("RefreshmentStandAPI/BuyRefreshment"):InvokeServer("hotdog_stand",autoTradeTo)
+                    ReplicatedStorage.API:FindFirstChild("RefreshmentStandAPI/BuyRefreshment"):InvokeServer("hotdog_stand",userNameVariable,50)
+                    wait(math.random(29, 34))
                     for i,v in pairs(getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)) do
                         v.Function()
                         v:Fire()
@@ -1845,12 +1856,16 @@ local Input = autoTradeTab:CreateInput({
             },
             },
             })
-    
 
+        -- Create a function that evaluates the variable dynamically
+        local evaluateVariable = loadstring("return game:GetService('Players')." .. autoTradeMoneyTo)
+        -- Call the function to get the value
+        local userNameVariable = evaluateVariable()
         spawn(function()
             for i = moneyTransferIterations, 1, -1 do
                 pcall(function()
-                    ReplicatedStorage.API:FindFirstChild("RefreshmentStandAPI/BuyRefreshment"):InvokeServer("lemonade_stand",autoTradeTo)
+                    ReplicatedStorage.API:FindFirstChild("RefreshmentStandAPI/BuyRefreshment"):InvokeServer("lemonade_stand",userNameVariable,20)
+                    wait(math.random(29, 34))
                     for i,v in pairs(getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)) do
                         v.Function()
                         v:Fire()
@@ -2018,25 +2033,83 @@ local farmPetToggle = autoFarmTab:CreateToggle({
         
         --autoFarmFailSafe checks for sleepy, if its been active for more than x then serverhop
         spawn(function()
+            local NoAilmentsCounter = 0
+            local AilmentsNotCompletedCounter = 0
             local autoFarmFailSafeAilmentCounter = 0
             while wait() and PetFarm do
-                pcall(function()
-                    local sleepyAilment = Player.PlayerGui.AilmentsMonitorApp.Ailments:FindFirstChild("sleepy")
-                    if sleepyAilment then
-                        autoFarmFailSafeAilmentCounter = autoFarmFailSafeAilmentCounter + 1
-                        print("autoFailSafe: Sleepy is a visible task" .. autoFarmFailSafeAilmentCounter)
-                    elseif not sleepyAilment then
-                        autoFarmFailSafeAilmentCounter = 0
+                --This will look for Visible Ailments and put them in a table
+                local visibleAilments = {}
+                local AilmentsMonitorApp = Player.PlayerGui.AilmentsMonitorApp
+                if AilmentsMonitorApp then
+                    for _, ailmentFrame in pairs(AilmentsMonitorApp.Ailments:GetChildren()) do
+                        if ailmentFrame:IsA("Frame") and ailmentFrame.Visible then
+                            local ailmentName = ailmentFrame.Name
+                            visibleAilments[ailmentName] = ailmentFrame
+                        end
                     end
-                end)
-                if autoFarmFailSafeAilmentCounter == 210 then
-                    print("autoFailSafe: triggered first action: " .. autoFarmFailSafeAilmentCounter .. ". Resetting character")
-                    ResetCharacter()
-                    print("autoFailSafe: Character has been reset")
-                elseif autoFarmFailSafeAilmentCounter >= 420 then
-                    ServerHopper()
                 end
-                wait(1)  -- Wait for 1 second before checking again
+                
+                --This will count how many Ailments are in the table previously created
+                local VisibleAilmentsCounter = 0
+                for ailmentName, _ in pairs(visibleAilments) do
+                    VisibleAilmentsCounter = VisibleAilmentsCounter + 1
+                end
+                
+                
+                --If there are no visible Ailments
+                --
+                if VisibleAilmentsCounter == 0 then
+                    NoAilmentsCounter = NoAilmentsCounter + 1
+                    print("autoFailSafe: No tasks for the last: " .. NoAilmentsCounter .. " secs")
+                    --If there are no visible Ailments for more than X...
+                    if NoAilmentsCounter >= 470 then
+                        print("No tasks for the last 7.50 minutes, do something you lazy fuck!!!")
+                        ServerHop()
+                       end
+                
+                --If there are Visible Ailments
+                --
+                elseif VisibleAilmentsCounter >= 1 then
+                    NoAilmentsCounter = 0
+                    pcall(function()
+                        --Check for sleepy amongst the active Ailments
+                        local sleepyAilment = Player.PlayerGui.AilmentsMonitorApp.Ailments:FindFirstChild("sleepy")
+                        if sleepyAilment then
+                            autoFarmFailSafeAilmentCounter = autoFarmFailSafeAilmentCounter + 1
+                            print("autoFailSafe: Sleepy is a visible task" .. autoFarmFailSafeAilmentCounter)
+                        elseif not sleepyAilment then
+                            autoFarmFailSafeAilmentCounter = 0
+                        end
+                    end)
+                    --If Sleepy has been a Visible Ailment for more than X...
+                    if autoFarmFailSafeAilmentCounter == 210 then
+                        print("autoFailSafe: triggered first action: " .. autoFarmFailSafeAilmentCounter .. ". Resetting character")
+                            ResetCharacter()
+                        print("autoFailSafe: Character has been reset")
+                    --If Sleepy has been a Visible Ailment for more than X...
+                    elseif autoFarmFailSafeAilmentCounter >= 420 then
+                        print("autoFailSafe: triggered second action")
+                            ServerHopper()
+                    end
+                    
+                    --If there are 5 or more Visible tasks then
+                    if VisibleAilmentsCounter >= 5 then
+                        AilmentsNotCompletedCounter = AilmentsNotCompletedCounter + 1
+                        print("autoFailSafe: More than 5 tasks visible for the last " .. AilmentsNotCompletedCounter .. " secs")
+                        --If there are 5 or more Visible tasks for longer than X then...
+                        if AilmentsNotCompletedCounter >= 60 then
+                            print("5 tasks have been active for more than 60 seconds, do something about it you lazy fuck!!!... ServerHopping")
+                            ServerHopper()
+                        end
+                    end
+                end
+                
+                --As soon as there are less than X tasks visible resent VisibleAilmentsCounter
+                if VisibleAilmentsCounter < 5 then
+                    AilmentsNotCompletedCounter = 0
+                end
+            
+                wait(1) 
             end
         end)
 
@@ -2201,7 +2274,6 @@ local farmAutoLures = autoFarmTab:CreateToggle({
                     end
                     
                     ReplicatedStorage.API["HousingAPI/ActivateFurniture"]:InvokeServer(game:GetService("Players").LocalPlayer, Lures(),"UseBlock",{["bait_unique"] = Pizza},Player.Character)
-                    print(Pizza)
                 end)
             end
         end)
@@ -2209,7 +2281,7 @@ local farmAutoLures = autoFarmTab:CreateToggle({
 })
 
 local farmClaimToggle = autoFarmTab:CreateToggle({
-    Name = "Auto Claim Quests",
+    Name = "Auto Claim Quests(needs fixing or removing)",
     CurrentValue = false,
     Flag = "farmAutoClaim", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(State)
@@ -2571,6 +2643,33 @@ local Button = autoBuyTab:CreateButton({
         spawn(function()
             for i = autoBuyGiftAmount, 1, -1 do
                 ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer("gifts",autoBuyGiftSelected,{})
+            end
+        end)
+    end,
+})
+
+local AutoOpenGifts = autoBuyTab:CreateToggle({
+    Name = "Auto Open All Gifts",
+    CurrentValue = false,
+    Flag = "AutoOpenGifts", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(State)
+        openGifts = State
+        spawn(function()
+            while openGifts do
+                wait(2)
+                local gifts = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.gifts or {}
+                local GiftTable
+                local GiftID
+                local Gift
+            
+                for i, v in pairs(gifts) do
+                    Gift = v.unique
+            
+                    pcall(function()
+                        ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(Gift)
+                        ReplicatedStorage.API:FindFirstChild("ShopAPI/OpenGift"):InvokeServer(Gift)
+                    end)
+                end
             end
         end)
     end,
