@@ -2009,7 +2009,7 @@ local farmPetToggle = autoFarmTab:CreateToggle({
                 --
                 if VisibleAilmentsCounter == 0 then
                     NoAilmentsCounter = NoAilmentsCounter + 1
-                    print("autoFailSafe: No tasks for the last: " .. NoAilmentsCounter .. " secs")
+                    --print("autoFailSafe: No tasks for the last: " .. NoAilmentsCounter .. " secs")
                     --If there are no visible Ailments for more than X...
                     if NoAilmentsCounter >= 470 then
                         print("No tasks for the last 7.50 minutes, do something you lazy fuck!!!")
@@ -2025,7 +2025,7 @@ local farmPetToggle = autoFarmTab:CreateToggle({
                         local sleepyAilment = Player.PlayerGui.AilmentsMonitorApp.Ailments:FindFirstChild("sleepy")
                         if sleepyAilment then
                             autoFarmFailSafeAilmentCounter = autoFarmFailSafeAilmentCounter + 1
-                            print("autoFailSafe: Sleepy is a visible task" .. autoFarmFailSafeAilmentCounter)
+                            --print("autoFailSafe: Sleepy is a visible task" .. autoFarmFailSafeAilmentCounter)
                         elseif not sleepyAilment then
                             autoFarmFailSafeAilmentCounter = 0
                         end
