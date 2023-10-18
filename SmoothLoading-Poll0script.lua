@@ -1502,7 +1502,7 @@ local Section = autoTradeTab:CreateSection("♻️  AUTO TRANSFER TO MAIN ACCOUN
 
 local Dropdown = autoTradeTab:CreateDropdown({
 Name = "Select What to Transfer",
-Options = {"Everything-1fg", "Grownpets-1fg", "GrownPets", "Pets", "Eggs", "Pots+Pet-lures", "Vehicles", "Strollers", "Gifts", "Toys", "Clothes"},
+Options = {"Everything-1fg", "Grownpets-1fg", "Pets", "Eggs", "Pots+Pet-lures", "Vehicles", "Strollers", "Gifts", "Toys", "Clothes"},
 CurrentOption = "",
 Flag = "Dropdown1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
 Callback = function(Name)
@@ -1531,6 +1531,92 @@ CurrentValue = false,
 Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
 Callback = function(State)
         autoTradeExecute = State
+
+        local autoTradeIgnorePets = {
+            "dog",
+            "cat",
+            "basic_egg_2022_mouse",
+            "japan_2022_sado_mole",
+            "seasis_2023_malaysian_tapir",
+        }
+
+        local function autoTradeAllPets()
+            pcall(function()
+                for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
+                    local shouldIgnore = false  -- Flag to determine if the item should be ignored
+            
+                    for _, pattern in ipairs(autoTradeIgnorePets) do
+                        if v["id"] == pattern and v["properties"]["age"] == 6 then
+                            shouldIgnore = true
+                            break  -- Exit the loop if a matching pattern is found
+                        end
+                    end
+            
+                    if not shouldIgnore then
+                        ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
+                    end
+                end
+            end)
+        end
+
+        local function autoTradeGrownpets()
+            pcall(function()
+                for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
+                    if v["properties"]["age"] == 6 then
+                        local shouldIgnore = false  -- Flag to determine if the item should be ignored
+            
+                        for _, pattern in ipairs(autoTradeIgnorePets) do
+                            if v["id"] == pattern then
+                                shouldIgnore = true
+                                break  -- Exit the loop if a matching pattern is found
+                            end
+                        end
+                
+                        if not shouldIgnore then
+                            ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
+                        end
+                    end 
+                end
+            end)
+        end
+        local function autoTradeGeneric(category)
+            pcall(function()
+                for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory[category]) do
+                    if category == pets then
+                        if not v["id"]:find("egg") then
+                            ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
+                        end
+                    elseif category == eggs then
+                        if v["id"]:find("egg") then
+                            ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
+                        end
+                    else
+                        ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
+                    end
+                end
+            end)
+        end
+        local function autoTradePots()
+            pcall(function()
+                for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food) do
+                    local shouldIgnore = false  -- Flag to determine if the item should be ignored
+
+                    for _, pattern in ipairs(IgnoreFoods) do
+                        if v["id"]:find(pattern) then
+                            shouldIgnore = true
+                            break  -- Exit the loop if a pattern is found
+                        end
+                    end
+
+                    if not shouldIgnore then
+                        ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
+                        wait(0.2)
+                    end
+                end
+            end)
+        end
+        
+
         spawn(function()
             while autoTradeExecute and wait(1) do
                 pcall(function()
@@ -1539,194 +1625,57 @@ Callback = function(State)
                         wait(5)
                     end 
                     if Player.PlayerGui.TradeApp.Frame.Visible then
-                        if autoTradeOffer == "Grownpets-1fg" then
-                            local Key3 = {}
-                            local Fgpet ={}
-                            local Fgpetlist = {}
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-                                local key3 = tostring(v["id"]) .. " - " .. tostring(v["properties"]["age"]) .. " years old"
-                                if not table.find(Fgpetlist, Key3) and v.properties.age == 6 and v.kind ~= "practice_dog" then
-                                    Fgpet[key3] = v
-                                    table.insert(Fgpetlist, key3)
-                                    table.sort(Fgpetlist)
-                                end
-                            end
-                            -- Get the first value from the table
-                            local firstValue = Fgpetlist[1]
-                            -- Extract the first word
-                            local firstWord = string.match(firstValue, "^(%S+)")
-                            print(Fgpetlist[1])
-                            for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-                                if v["properties"]["age"] == 6 and v["id"] ~= firstWord then
-                                    ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                    wait(0.2)
-                                end 
-                            end
-                        end 
                         if autoTradeOffer == "GrownPets" then
-                            for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-                                if v["properties"]["age"] == 6 then
-                                    ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                    wait(0.2)
-                                end 
-                            end
+                            autoTradeGrownpets()
                         end 
                         if autoTradeOffer == "Pets" then
-                            for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-                                if not v["id"]:find("egg") then
-                                    ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                    wait(0.2)
-                                end
-                            end
+                            autoTradeAllPets()
                         end 
                         if autoTradeOffer == "Eggs" then
-                            for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-                                if v["id"]:find("egg") then
-                                    ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                    wait(0.2)
-                                end 
-                            end
+                            autoTradeGeneric("eggs")
                         end 
                         if autoTradeOffer == "Pets+Eggs" then
-                            for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
-                            end
-                            for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-                                if v["id"]:find("egg") then
-                                    ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                    wait(0.2)
-                                end 
-                            end
+                            autoTradeAllPets()
+                            autoTradeGeneric("eggs")
                         end 
                         if autoTradeOffer == "Vehicles" then
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.transport) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
-                            end 
+                            autoTradeGeneric("transport")
                         end 
                         if autoTradeOffer == "Strollers" then
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.strollers) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
-                            end 
+                            autoTradeGeneric("strollers")
                         end 
                         if autoTradeOffer == "Toys" then
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.toys) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
-                            end 
+                            autoTradeGeneric("toys")
                         end 
                         if autoTradeOffer == "Gifts" then
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.gifts) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
-                            end 
+                            autoTradeGeneric("gifts")
                         end
                         if autoTradeOffer == "Clothes" then
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pet_accessories) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
-                            end 
+                            autoTradeGeneric("pet_accessories")
                         end
                         if autoTradeOffer == "Pots+Pet-lures" then                   
-                            for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food) do
-                                local shouldIgnore = false  -- Flag to determine if the item should be ignored
-
-                                for _, pattern in ipairs(IgnoreFoods) do
-                                    if v["id"]:find(pattern) then
-                                        shouldIgnore = true
-                                        break  -- Exit the loop if a pattern is found
-                                    end
-                                end
-
-                                if not shouldIgnore then
-                                    ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                    wait(0.2)
-                                end
-                            end
+                            autoTradePots()
                         end
                         if autoTradeOffer == "Everything-1fg" then
-                            --gifts
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.gifts) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
-                            end 
-                            --toys
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.toys) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
-                            end 
-                            --vehicles
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.transport) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
+                            autoTradeAllPets()
+                            autoTradeGeneric("eggs")
+                            autoTradeGeneric("transport")
+                            autoTradeGeneric("strollers")
+                            autoTradeGeneric("toys")
+                            autoTradeGeneric("gifts")
+                            autoTradeGeneric("pet_accessories")
+                            autoTradePots()
+                        end
+                        spawn(function()
+                            ReplicatedStorage.API:FindFirstChild("TradeAPI/AcceptNegotiation"):FireServer()
+                            for i,v in pairs(getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)) do
+                                v.Function()
+                                v:Fire()
                             end
-                            --eggs
-                            for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-                                if v["id"]:find("egg") then
-                                    ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                    wait(0.2)
-                                end 
-                            end
-                            --Clothes
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pet_accessories) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
-                            end
-                            --Strollers
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.strollers) do
-                                ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                wait(0.2)
-                            end 
-                            --Pots + Pet lures
-                            for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food) do
-                                local shouldIgnore = false  -- Flag to determine if the item should be ignored
-
-                                for _, pattern in ipairs(IgnoreFoods) do
-                                    if v["id"]:find(pattern) then
-                                        shouldIgnore = true
-                                        break  -- Exit the loop if a pattern is found
-                                    end
-                                end
-
-                                if not shouldIgnore then
-                                    ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                    wait(0.2)
-                                end
-                            end
-                            --All pets -1 fullgrown
-                            local Key3 = {}
-                            local Fgpet ={}
-                            local Fgpetlist = {}
-                            for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-                                local key3 = tostring(v["id"]) .. " - " .. tostring(v["properties"]["age"]) .. " years old"
-                                if not table.find(Fgpetlist, Key3) and v.properties.age == 6 and v.kind ~= "practice_dog" then
-                                    Fgpet[key3] = v
-                                    table.insert(Fgpetlist, key3)
-                                    table.sort(Fgpetlist)
-                                end
-                            end
-                            -- Get the first value from the table
-                            local firstValue = Fgpetlist[1]
-                            -- Extract the first word
-                            local firstWord = string.match(firstValue, "^(%S+)")
-                            print(Fgpetlist[1])
-                            for i, v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-                                if v["id"] ~= firstWord then
-                                    ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v.unique)
-                                    wait(0.2)
-                                end 
-                            end
-                        end 
-                        ReplicatedStorage.API:FindFirstChild("TradeAPI/AcceptNegotiation"):FireServer()
-                        wait(5)
-                        ReplicatedStorage.API:FindFirstChild("TradeAPI/ConfirmTrade"):FireServer()
-                        for i,v in pairs(getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)) do
-                            v.Function()
-                            v:Fire()
-                        end 
-                    end 
+                            wait(3)
+                            ReplicatedStorage.API:FindFirstChild("TradeAPI/ConfirmTrade"):FireServer()
+                        end)
+                    end
                 end)
             end 
         end)
