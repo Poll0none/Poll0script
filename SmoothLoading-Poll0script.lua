@@ -1,4 +1,4 @@
---Halloween Event - Auto TileSkip/HalloweenShop TP/MiniGame TP
+--Halloween Update week 3. Disabled auto toggles on characterload temporarily
 
 
 --DELETE THIS TOMORROW!! only temporary override of serverhop settings!
@@ -277,6 +277,7 @@ local Eggs = {
 }
 
 local gifts = {
+    "halloween_2023_scarecrow_box",
     "wings_2022_bucks_wing_chest",
     "legend_hat_2022_regal_chest",
     "legend_hat_2022_simple_chest",
@@ -2521,6 +2522,17 @@ local Input = autoBuyTab:CreateInput({
     print(autoBuyGiftSelected)
     print(autoBuyGiftBudget)
 
+    if autoBuyGiftSelected == "halloween_2023_scarecrow_box" then
+        local calc = String / 18000
+        getgenv().autoBuyGiftAmount = math.floor(calc)
+        Rayfield:Notify({
+            Title = "💰  AutoBuy 💰",
+            Content = "\n" .. "You are about to buy: " .. autoBuyGiftAmount .. " " .. autoBuyGiftSelected  .. "\n" .. "Click confirm to execute",
+            Duration = 6.5,
+            Image = 4483362458,
+            })
+    end
+
     if autoBuyGiftSelected == "wings_2022_bucks_wing_chest" then
         local calc = String / 600
         getgenv().autoBuyGiftAmount = math.floor(calc)
@@ -2624,6 +2636,40 @@ local AutoOpenGifts = autoBuyTab:CreateToggle({
     end,
 })
 
+local AutoOpenCrowBox = autoBuyTab:CreateToggle({
+    Name = "Auto Open CrowBox",
+    CurrentValue = false,
+    Flag = "AutoOpenCrowBox", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(State)
+        openCrows = State
+        spawn(function()
+            while openCrows do
+                wait(2)
+                local gifts = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.gifts or {}
+                local GiftTable
+                local GiftID
+                local Gift
+            
+                for i, v in pairs(gifts) do
+                    if v["id"] == "halloween_2023_scarecrow_box" then
+                        Gift = v.unique
+                
+                        pcall(function()
+                            ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(Gift)
+                            wait()
+                            --ReplicatedStorage.API:FindFirstChild("ShopAPI/OpenGift"):InvokeServer(Gift)
+                            ReplicatedStorage.API["ToolAPI/ServerUseTool"]:FireServer(Gift,"START")
+                            wait()
+                            ReplicatedStorage.API["LootBoxAPI/ExchangeItemForReward"]:InvokeServer("halloween_2023_scarecrow_box",Gift)
+                            wait()
+                        end)
+                    end
+                end
+            end
+        end)
+    end,
+})
+
 
 --execute defaults after if characterLoad
 
@@ -2631,21 +2677,21 @@ local characterLoad = game.Workspace:WaitForChild(game.Players.LocalPlayer.Name)
 getgenv().ToggleAutoFarm = true
 if characterLoad and ToggleAutoFarm == true then
     wait(5)
-    minimiseGUI:Set(true)
+    --minimiseGUI:Set(true)
     wait(0.2)
     halloweenTricks:Set(true)
     wait(0.2)
-    cpuUsage:Set(true)
+    --cpuUsage:Set(true)
     wait(0.2)
     farmAutoLures:Set(true)
     wait(0.2)
     DropdownFG:Set(Fgpetlist[1])
     wait(0.2)
-    farmPetToggle:Set(true)
+   --farmPetToggle:Set(true)
     wait(0.2)
-    farmBabyToggle:Set(true)
+    --farmBabyToggle:Set(true)
     wait(0.2)
-    halloweenMiniGame:Set(true)
+    --halloweenMiniGame:Set(true)
 end
 
 
