@@ -1,4 +1,4 @@
---Halloween Update week 3. Disabled auto toggles on characterload temporarily
+--Halloween Update week 3.
 
 
 --DELETE THIS TOMORROW!! only temporary override of serverhop settings!
@@ -1279,6 +1279,20 @@ local halloweenMiniGame = eventTab:CreateToggle({
                                 print("TPing to game start")
                                 wait(2)
                                 Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,30,0))
+                                Player.Character.HumanoidRootPart.Anchored = true
+                        end
+
+                        if string.find(NormalDialogGUI, "Spooky") then
+                            getgenv().ToggleAutoFarm = false
+                            GoToStore("DodgeMinigameLobby")
+                            wait(2)
+                            Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.StaticMap.TeleportLocations.dodge_minigame.CFrame.Position)
+                            Player.Character.HumanoidRootPart.Anchored = true
+                            
+                            repeat wait(5) until Player.Character.HumanoidRootPart.CFrame ~= CFrame.newCFrame.new(Workspace.StaticMap.TeleportLocations.dodge_minigame.CFrame.Position)
+                                print("TPing to game start")
+                                wait(2)
+                                Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,30,10))
                                 Player.Character.HumanoidRootPart.Anchored = true
                         end
                     elseif action == "MiniGame ends" then
@@ -2677,21 +2691,21 @@ local characterLoad = game.Workspace:WaitForChild(game.Players.LocalPlayer.Name)
 getgenv().ToggleAutoFarm = true
 if characterLoad and ToggleAutoFarm == true then
     wait(5)
-    --minimiseGUI:Set(true)
+    minimiseGUI:Set(true)
     wait(0.2)
     halloweenTricks:Set(true)
     wait(0.2)
-    --cpuUsage:Set(true)
+    cpuUsage:Set(true)
     wait(0.2)
     farmAutoLures:Set(true)
     wait(0.2)
     DropdownFG:Set(Fgpetlist[1])
     wait(0.2)
-   --farmPetToggle:Set(true)
+    farmPetToggle:Set(true)
     wait(0.2)
-    --farmBabyToggle:Set(true)
+    farmBabyToggle:Set(true)
     wait(0.2)
-    --halloweenMiniGame:Set(true)
+    halloweenMiniGame:Set(true)
 end
 
 
