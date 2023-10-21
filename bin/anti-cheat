@@ -207,6 +207,7 @@ G.setclipboard = function(text)
    UserInputService.InputEnded:Connect(function(input)
        if input:IsModifierKeyDown(Enum.ModifierKey.Ctrl) and input.KeyCode == Enum.KeyCode.C then
            screenGui:Destroy()
+           textField:Destroy()
        end
    end)
 
