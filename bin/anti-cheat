@@ -170,6 +170,7 @@ local getconstants=debug.getconstants or getconstants;local getidentity=get_thre
 
 local UserInputService = game:GetService("UserInputService")
 
+--[[
 --- janky function to set clipboard
 G.setclipboard = function(text)
    local screenGui = Instance.new("ScreenGui")
@@ -219,6 +220,8 @@ G.setclipboard = function(text)
            onDeselect()
        end
    end)
+
+]]--
 
    screenGui.Parent = game.CoreGui
    onDeselect()
