@@ -221,8 +221,8 @@ G.setclipboard = function(text)
        end
    end)
 
-]]--
-
    screenGui.Parent = game.CoreGui
    onDeselect()
 end
+
+]]--
