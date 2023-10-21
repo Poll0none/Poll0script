@@ -1289,7 +1289,7 @@ local halloweenMiniGame = eventTab:CreateToggle({
                             Player.Character.HumanoidRootPart.CFrame = CFrame.new(Workspace.StaticMap.TeleportLocations.dodge_minigame.CFrame.Position)
                             Player.Character.HumanoidRootPart.Anchored = true
                             
-                            repeat wait(5) until Player.Character.HumanoidRootPart.CFrame ~= CFrame.newCFrame.new(Workspace.StaticMap.TeleportLocations.dodge_minigame.CFrame.Position)
+                            repeat wait(5) until Player.Character.HumanoidRootPart.CFrame ~= CFrame.new(Workspace.StaticMap.TeleportLocations.dodge_minigame.CFrame.Position)
                                 print("TPing to game start")
                                 wait(2)
                                 Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,30,10))
